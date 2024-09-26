@@ -1,12 +1,12 @@
-"use client"; // Para o client-side rendering
+"use client"; 
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation"; 
 import { supabase } from "../../../lib/supabaseClient";
-import './AmbilightPlayer.css'; // Importa o CSS responsivo
+import './AmbilightPlayer.css'; 
 
 const AmbilightPlayer = ({ params }) => {
-  const { uuid } = params; // Pega o UUID da URL para carregar o conteúdo
+  const { uuid } = params; 
   const videoRef = useRef(null);
   const [conteudo, setConteudo] = useState(null);
   const [ambilightColors, setAmbilightColors] = useState({
@@ -16,9 +16,6 @@ const AmbilightPlayer = ({ params }) => {
     rightColor: '#000',
   });
 
-  const router = useRouter();
-
-  // Carrega o conteúdo do Supabase
   useEffect(() => {
     const fetchContent = async () => {
       const { data, error } = await supabase
@@ -35,7 +32,6 @@ const AmbilightPlayer = ({ params }) => {
     fetchContent();
   }, [uuid]);
 
-  // Função para gerar o efeito Ambilight
   useEffect(() => {
     if (!conteudo || !videoRef.current) return;
 
