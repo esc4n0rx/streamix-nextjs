@@ -25,9 +25,9 @@ export default function ConfiguracaoPage() {
     poster_url: "",
   });
   const [isEditing, setIsEditing] = useState(false);
-  const [editingUuid, setEditingUuid] = useState<string | null>(null); 
+  const [editingUuid, setEditingUuid] = useState<string | null>(null);
 
-  
+ 
   useEffect(() => {
     const fetchData = async () => {
       const { data, error } = await supabase.from("conteudos").select("*");
@@ -40,10 +40,11 @@ export default function ConfiguracaoPage() {
     fetchData();
   }, []);
 
+ 
   const saveContent = async (e: React.FormEvent) => {
     e.preventDefault();
     if (isEditing) {
-     
+      
       const { error } = await supabase
         .from("conteudos")
         .update(newContent)
@@ -57,10 +58,10 @@ export default function ConfiguracaoPage() {
         setEditingUuid(null);
       }
     } else {
-    
-      const { error } = await supabase.from("conteudos").insert([newContent]);
-      if (!error) {
-        setConteudos([...conteudos, newContent]);
+     
+      const { data, error } = await supabase.from("conteudos").insert([newContent]).select();
+      if (!error && data) {
+        setConteudos([...conteudos, data[0]]); 
       }
     }
 
@@ -82,6 +83,7 @@ export default function ConfiguracaoPage() {
     }
   };
 
+ 
   const editContent = (conteudo: Conteudo) => {
     setIsEditing(true);
     setEditingUuid(conteudo.uuid);
@@ -100,6 +102,8 @@ export default function ConfiguracaoPage() {
       <h1 className="text-3xl font-bold mb-4">
         {isEditing ? "Editar Conteúdo" : "Adicionar Novo Conteúdo"}
       </h1>
+
+
       <form onSubmit={saveContent} className="mb-8">
         <div className="mb-4">
           <label className="block mb-2">Nome</label>
@@ -165,6 +169,7 @@ export default function ConfiguracaoPage() {
         </button>
       </form>
 
+     
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {conteudos.map((conteudo) => (
           <div key={conteudo.uuid} className="bg-gray-800 p-4 rounded-lg shadow-lg">

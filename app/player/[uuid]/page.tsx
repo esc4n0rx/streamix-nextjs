@@ -1,14 +1,22 @@
-"use client"; 
+"use client";
 
 import { useState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation"; 
 import { supabase } from "../../../lib/supabaseClient";
-import './AmbilightPlayer.css'; 
+import './AmbilightPlayer.css';
 
-const AmbilightPlayer = ({ params }) => {
+type Conteudo = {
+  uuid: string;
+  nome: string;
+  url_streaming: string;
+  poster_url: string;
+  sinopse: string;
+  avaliacao: number;
+};
+
+export default function AmbilightPlayer({ params }: { params: { uuid: string } }) {
   const { uuid } = params; 
-  const videoRef = useRef(null);
-  const [conteudo, setConteudo] = useState(null);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const [conteudo, setConteudo] = useState<Conteudo | null>(null);
   const [ambilightColors, setAmbilightColors] = useState({
     topColor: '#000',
     bottomColor: '#000',
@@ -23,15 +31,18 @@ const AmbilightPlayer = ({ params }) => {
         .select("*")
         .eq("uuid", uuid)
         .single();
+
       if (error) {
         console.error("Erro ao carregar conteúdo:", error);
       } else {
-        setConteudo(data);
+        setConteudo(data as Conteudo); 
       }
     };
+
     fetchContent();
   }, [uuid]);
 
+  
   useEffect(() => {
     if (!conteudo || !videoRef.current) return;
 
@@ -41,9 +52,9 @@ const AmbilightPlayer = ({ params }) => {
     canvas.width = 32;
     canvas.height = 18;
 
-    let animationFrameId;
+    let animationFrameId: number;
 
-    const averageColor = (data) => {
+    const averageColor = (data: Uint8ClampedArray) => {
       let r = 0, g = 0, b = 0, count = 0;
       for (let i = 0; i < data.length; i += 4) {
         r += data[i];
@@ -55,7 +66,7 @@ const AmbilightPlayer = ({ params }) => {
     };
 
     const getEdgeColors = () => {
-      if (video && video.readyState === video.HAVE_ENOUGH_DATA) {
+      if (video && video.readyState === video.HAVE_ENOUGH_DATA && context) {
         context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
         const topData = context.getImageData(0, 0, canvas.width, 1).data;
@@ -88,7 +99,7 @@ const AmbilightPlayer = ({ params }) => {
     return <div className="text-white text-center">Carregando...</div>;
   }
 
-  // Verificar se o vídeo deve ser carregado localmente ou via URL
+  
   const isLocalVideo = conteudo.url_streaming.includes("vids/");
 
   return (
@@ -114,6 +125,4 @@ const AmbilightPlayer = ({ params }) => {
       </div>
     </div>
   );
-};
-
-export default AmbilightPlayer;
+}
