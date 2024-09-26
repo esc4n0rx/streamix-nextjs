@@ -1,39 +1,49 @@
-"use client"; // Para o client-side rendering
+"use client"; 
 
 import { useState, useEffect } from "react";
 import { supabase } from "../../lib/supabaseClient";
 
+
+type Conteudo = {
+  uuid: string;
+  nome: string;
+  categoria: string;
+  sinopse: string;
+  avaliacao: number;
+  url_streaming: string;
+  poster_url: string;
+};
+
 export default function ConfiguracaoPage() {
-  const [conteudos, setConteudos] = useState([]);
+  const [conteudos, setConteudos] = useState<Conteudo[]>([]); 
   const [newContent, setNewContent] = useState({
     nome: "",
     categoria: "",
     sinopse: "",
     avaliacao: 0,
     url_streaming: "",
-    poster_url: ""
+    poster_url: "",
   });
   const [isEditing, setIsEditing] = useState(false);
-  const [editingUuid, setEditingUuid] = useState(null); // Armazena o UUID do conteúdo que está sendo editado
+  const [editingUuid, setEditingUuid] = useState<string | null>(null); 
 
-  // Carrega os conteúdos do Supabase
+  
   useEffect(() => {
     const fetchData = async () => {
       const { data, error } = await supabase.from("conteudos").select("*");
       if (error) {
         console.error("Erro ao buscar conteúdos:", error);
-      } else {
-        setConteudos(data);
+      } else if (data) {
+        setConteudos(data as Conteudo[]); 
       }
     };
     fetchData();
   }, []);
 
-  // Função para adicionar ou editar um conteúdo
-  const saveContent = async (e) => {
+  const saveContent = async (e: React.FormEvent) => {
     e.preventDefault();
     if (isEditing) {
-      // Atualizar conteúdo existente
+     
       const { error } = await supabase
         .from("conteudos")
         .update(newContent)
@@ -47,7 +57,7 @@ export default function ConfiguracaoPage() {
         setEditingUuid(null);
       }
     } else {
-      // Adicionar novo conteúdo
+    
       const { error } = await supabase.from("conteudos").insert([newContent]);
       if (!error) {
         setConteudos([...conteudos, newContent]);
@@ -60,20 +70,19 @@ export default function ConfiguracaoPage() {
       sinopse: "",
       avaliacao: 0,
       url_streaming: "",
-      poster_url: ""
+      poster_url: "",
     });
   };
 
-  // Função para remover um conteúdo
-  const removeContent = async (uuid) => {
+ 
+  const removeContent = async (uuid: string) => {
     const { error } = await supabase.from("conteudos").delete().eq("uuid", uuid);
     if (!error) {
       setConteudos(conteudos.filter((conteudo) => conteudo.uuid !== uuid));
     }
   };
 
-  // Função para editar um conteúdo
-  const editContent = (conteudo) => {
+  const editContent = (conteudo: Conteudo) => {
     setIsEditing(true);
     setEditingUuid(conteudo.uuid);
     setNewContent({
@@ -82,7 +91,7 @@ export default function ConfiguracaoPage() {
       sinopse: conteudo.sinopse,
       avaliacao: conteudo.avaliacao,
       url_streaming: conteudo.url_streaming,
-      poster_url: conteudo.poster_url
+      poster_url: conteudo.poster_url,
     });
   };
 
@@ -91,8 +100,6 @@ export default function ConfiguracaoPage() {
       <h1 className="text-3xl font-bold mb-4">
         {isEditing ? "Editar Conteúdo" : "Adicionar Novo Conteúdo"}
       </h1>
-
-      {/* Formulário para adicionar ou editar conteúdo */}
       <form onSubmit={saveContent} className="mb-8">
         <div className="mb-4">
           <label className="block mb-2">Nome</label>
@@ -128,7 +135,7 @@ export default function ConfiguracaoPage() {
           <input
             type="number"
             value={newContent.avaliacao}
-            onChange={(e) => setNewContent({ ...newContent, avaliacao: e.target.value })}
+            onChange={(e) => setNewContent({ ...newContent, avaliacao: Number(e.target.value) })}
             className="p-2 bg-gray-800 rounded w-full"
           />
         </div>
@@ -158,7 +165,6 @@ export default function ConfiguracaoPage() {
         </button>
       </form>
 
-      {/* Lista de conteúdos */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {conteudos.map((conteudo) => (
           <div key={conteudo.uuid} className="bg-gray-800 p-4 rounded-lg shadow-lg">
