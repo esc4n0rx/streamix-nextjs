@@ -1,9 +1,15 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
-import jwt, { JwtPayload } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 import Cookies from "js-cookie";
 import { supabase } from "../../lib/supabaseClient";
+
+// Definir a estrutura esperada do payload JWT
+interface DecodedToken {
+  userId: string;
+  exp?: number;
+}
 
 export default function ProfileSelectionPage() {
   const router = useRouter();
@@ -24,7 +30,7 @@ export default function ProfileSelectionPage() {
       }
 
       try {
-        const decoded = jwt.decode(token) as JwtPayload;
+        const decoded = jwt.decode(token) as DecodedToken;
         const userId = decoded?.userId;
 
         if (!userId) {
@@ -109,7 +115,7 @@ export default function ProfileSelectionPage() {
   const handleAddProfile = async () => {
     try {
       const token = Cookies.get("token");
-      const decoded = jwt.decode(token) as JwtPayload;
+      const decoded = jwt.decode(token) as DecodedToken;
       const userId = decoded?.userId;
 
       if (!userId) {
