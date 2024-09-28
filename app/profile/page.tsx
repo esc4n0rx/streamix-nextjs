@@ -5,6 +5,13 @@ import jwt from "jsonwebtoken";
 import Cookies from "js-cookie";
 import { supabase } from "../../lib/supabaseClient";
 
+// Definir a estrutura de um perfil
+interface Profile {
+  id: number;
+  profile_name: string;
+  avatar_url: string | null;
+}
+
 interface DecodedToken {
   userId: string;
   exp?: number;
@@ -12,10 +19,10 @@ interface DecodedToken {
 
 export default function ProfileSelectionPage() {
   const router = useRouter();
-  const [profiles, setProfiles] = useState([]);
+  const [profiles, setProfiles] = useState<Profile[]>([]); // Tipagem explícita para profiles
   const [sessionError, setSessionError] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
-  const [editingProfile, setEditingProfile] = useState<any>(null);
+  const [editingProfile, setEditingProfile] = useState<Profile | null>(null); // Tipagem para editingProfile
   const [newProfileName, setNewProfileName] = useState("");
 
   useEffect(() => {
@@ -56,13 +63,15 @@ export default function ProfileSelectionPage() {
     fetchProfiles();
   }, [router]);
 
-  const handleEditProfile = (profile: any) => {
+  const handleEditProfile = (profile: Profile) => {
     setIsEditing(true);
     setEditingProfile(profile);
     setNewProfileName(profile.profile_name);
   };
 
   const handleSaveEdit = async () => {
+    if (!editingProfile) return; // Garantir que editingProfile esteja definido
+
     try {
       const response = await fetch(`/api/profiles/${editingProfile.id}`, {
         method: "PUT",
