@@ -14,13 +14,13 @@ export default function LoginPage() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Verifica o login e a senha na tabela 'usuarios'
+    
     const { data, error } = await supabase
       .from("usuarios")
       .select("*")
       .eq("login", login)
       .eq("senha", senha)
-      .single(); // Usamos .single() para pegar apenas um usuário
+      .single(); 
 
     if (error || !data) {
       setError("Login ou senha incorretos");
@@ -28,7 +28,7 @@ export default function LoginPage() {
       return;
     }
 
-    // Redireciona para uma página autenticada
+    
     router.push("/dashboard");
   };
 
@@ -39,7 +39,7 @@ export default function LoginPage() {
         backgroundImage: `url("https://ucare.timepad.ru/ba19db85-233a-4e4c-867e-fd06d35b3a8d/poster_event_686269.jpg")`,
       }}
     >
-      <div className="absolute inset-0 bg-black opacity-50"></div> {/* Layer de escurecimento */}
+      <div className="absolute inset-0 bg-black opacity-50"></div> 
       
       <form
         onSubmit={handleLogin}

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { supabase } from "../../lib/supabaseClient";
-import Image from 'next/image';
+import './Banner.css';
 
 type Conteudo = {
   uuid: string;
@@ -16,8 +16,8 @@ type Conteudo = {
 };
 
 export default function DashboardPage() {
-  const [conteudos, setConteudos] = useState<Conteudo[]>([]); 
-  const [selectedContent, setSelectedContent] = useState<Conteudo | null>(null); 
+  const [conteudos, setConteudos] = useState<Conteudo[]>([]);
+  const [selectedContent, setSelectedContent] = useState<Conteudo | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -25,156 +25,166 @@ export default function DashboardPage() {
       if (error) {
         console.error("Erro ao buscar conteúdos:", error);
       } else if (data) {
-        setConteudos(data as Conteudo[]); 
+        setConteudos(data as Conteudo[]);
       }
     };
     fetchData();
   }, []);
 
-  
   const closePopup = () => setSelectedContent(null);
 
   return (
-    <div
-      className="relative min-h-screen bg-cover bg-center text-white"
-      style={{
-        backgroundImage: `url('https://ucare.timepad.ru/ba19db85-233a-4e4c-867e-fd06d35b3a8d/poster_event_686269.jpg')`,
-      }}
-    >
-      
-      <div className="absolute inset-0 bg-black bg-opacity-50 backdrop-blur-lg z-0"></div>
+    <div className="main-content">
+      {/* Fundo com efeito de blur */}
+      <div className="background-blur"></div>
 
-     
-      <div className="relative z-10 p-4 sm:p-8">
-        
-        <nav className="fixed bottom-0 left-0 right-0 z-20 flex justify-center bg-black bg-opacity-80 py-4">
-          <ul className="flex space-x-2 sm:space-x-6">
-            <li><a href="#" className="text-purple-500 hover:text-white">Filmes</a></li>
-            <li><a href="#" className="text-purple-500 hover:text-white">Séries</a></li>
-            <li><a href="#" className="text-purple-500 hover:text-white">Novelas</a></li>
-            <li><a href="#" className="text-purple-500 hover:text-white">Animes</a></li>
-            <li><a href="#" className="text-purple-500 hover:text-white">Solicitar Conteúdos</a></li>
-          </ul>
-        </nav>
+      <div className="relative min-h-screen">
+        {/* Navbar */}
+        <header className="fixed top-0 left-0 right-0 flex justify-between items-center p-4  bg-opacity-80 z-50">
+          <div className="flex items-center space-x-4">
+            <img src="/img/logo.png" alt="Streamix Logo" width={100} height={40} />
+            <nav className="flex space-x-6">
+              <a href="#" className="text-lg font-semibold hover:text-gray-300">Início</a>
+              <a href="#" className="text-lg font-semibold hover:text-gray-300">Séries</a>
+              <a href="#" className="text-lg font-semibold hover:text-gray-300">Filmes</a>
+              <a href="#" className="text-lg font-semibold hover:text-gray-300">Animes</a>
+              <a href="#" className="text-lg font-semibold hover:text-gray-300">Solicitar Conteúdos</a>
+            </nav>
+          </div>
+          <div>
+            <a href="#" className="text-lg hover:text-gray-300">
+              <img src="/img/profile.png" alt="Profile" width={40} height={40} />
+            </a>
+          </div>
+        </header>
 
-        <div className="my-8">
-          <h2 className="text-2xl font-bold mb-4">Novidades</h2>
-          <div className="relative w-full h-56 sm:h-96 overflow-hidden">
-            <div className="absolute w-full h-full flex animate-slideShow space-x-4 sm:space-x-6">
-              {conteudos.slice(0, 5).map((conteudo) => (
-                <div
-                  key={conteudo.uuid}
-                  className="w-2/5 sm:w-1/5 flex-shrink-0 cursor-pointer"
-                  onClick={() => setSelectedContent(conteudo)}
-                >
-                  <Image
-                    src={conteudo.poster_url}
-                    alt={conteudo.nome}
-                    width={500}
-                    height={300}
-                    className="w-full h-full object-cover rounded-lg shadow-lg"
-                  />
-                </div>
-              ))}
+        {/* Carrossel de Banner */}
+        <div className="relative mt-20 mx-auto max-w-full p-4 banner-container">
+          <div className="rounded-lg overflow-hidden shadow-lg">
+            <div className="relative h-[300px] carousel-container">
+              <div className="carousel flex items-center">
+                {conteudos.map((conteudo, index) => (
+                  <div
+                    key={index}
+                    className="flex flex-col items-center text-center w-[200px]"
+                    onClick={() => setSelectedContent(conteudo)}
+                  >
+                    <img
+                      src={conteudo.poster_url}
+                      alt={conteudo.nome}
+                      className="h-[180px] w-[140px] object-cover rounded-lg"
+                    />
+                    <h2 className="text-lg font-bold mt-2">{conteudo.nome}</h2>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Seções de conteúdo */}
-        <div className="my-8">
-          <h2 className="text-2xl font-bold mb-4">Filmes e Séries</h2>
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+        {/* Seções de Conteúdos */}
+        <div className="mt-12 px-4 sm:px-8">
+          <h2 className="text-2xl font-bold mb-4">Recomendado para você</h2>
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-6 grid-container">
             {conteudos
-              .filter((conteudo) => conteudo.categoria === "Filme" || conteudo.categoria === "Serie")
+              .filter((conteudo) => conteudo.avaliacao >= 7.5)
               .map((conteudo) => (
                 <div
                   key={conteudo.uuid}
-                  className="bg-gray-800 p-2 sm:p-4 rounded-lg shadow-lg cursor-pointer"
+                  className="relative rounded-lg shadow-lg overflow-hidden card-content cursor-pointer"
                   onClick={() => setSelectedContent(conteudo)}
                 >
-                  <Image
+                  <img
                     src={conteudo.poster_url}
                     alt={conteudo.nome}
-                    width={500}
-                    height={300}
-                    className="w-full h-32 sm:h-64 object-cover rounded-lg mb-2 sm:mb-4"
+                    className="w-full h-full object-cover"
                   />
-                  <h3 className="text-sm sm:text-lg font-semibold">{conteudo.nome}</h3>
-                  <p className="text-xs sm:text-sm text-gray-400">Avaliação: {conteudo.avaliacao}</p>
+                  <div className="absolute bottom-0 w-full  bg-opacity-60 text-white p-2 text-center text-sm sm:text-lg font-semibold card-overlay">
+                    {conteudo.nome}
+                  </div>
                 </div>
               ))}
           </div>
-        </div>
 
-        <div className="my-8">
-          <h2 className="text-2xl font-bold mb-4">Em Alta</h2>
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-            {conteudos
-              .filter((conteudo) => conteudo.avaliacao >= 8.5)
-              .map((conteudo) => (
-                <div
-                  key={conteudo.uuid}
-                  className="bg-gray-800 p-2 sm:p-4 rounded-lg shadow-lg cursor-pointer"
-                  onClick={() => setSelectedContent(conteudo)}
-                >
-                  <Image
-                    src={conteudo.poster_url}
-                    alt={conteudo.nome}
-                    width={500}
-                    height={300}
-                    className="w-full h-32 sm:h-64 object-cover rounded-lg mb-2 sm:mb-4"
-                  />
-                  <h3 className="text-sm sm:text-lg font-semibold">{conteudo.nome}</h3>
-                  <p className="text-xs sm:text-sm text-gray-400">Avaliação: {conteudo.avaliacao}</p>
-                </div>
-              ))}
-          </div>
-        </div>
-
-        <div className="my-8">
-          <h2 className="text-2xl font-bold mb-4">Recentemente Adicionados</h2>
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-            {conteudos
-              .sort((a, b) => new Date(b.data_criacao).getTime() - new Date(a.data_criacao).getTime())
-              .map((conteudo) => (
-                <div
-                  key={conteudo.uuid}
-                  className="bg-gray-800 p-2 sm:p-4 rounded-lg shadow-lg cursor-pointer"
-                  onClick={() => setSelectedContent(conteudo)}
-                >
-                  <Image
-                    src={conteudo.poster_url}
-                    alt={conteudo.nome}
-                    width={500}
-                    height={300}
-                    className="w-full h-32 sm:h-64 object-cover rounded-lg mb-2 sm:mb-4"
-                  />
-                  <h3 className="text-sm sm:text-lg font-semibold">{conteudo.nome}</h3>
-                  <p className="text-xs sm:text-sm text-gray-400">Avaliação: {conteudo.avaliacao}</p>
-                </div>
-              ))}
-          </div>
-        </div>
-
-       
-        {selectedContent && (
-          <div className="fixed inset-0 bg-black bg-opacity-70 flex justify-center items-center z-30">
-            <div className="bg-gray-900 p-4 sm:p-8 rounded-lg max-w-xs sm:max-w-md mx-auto text-center">
-              <h2 className="text-lg sm:text-2xl font-bold mb-2 sm:mb-4">{selectedContent.nome}</h2>
-              <p className="mb-2 sm:mb-4">{selectedContent.sinopse}</p>
-              <p className="mb-2 sm:mb-4">Avaliação: {selectedContent.avaliacao}</p>
-              <a
-                href={`/player/${selectedContent.uuid}`}
-                className="bg-purple-600 text-white py-2 px-4 rounded hover:bg-purple-800"
+          <h2 className="text-2xl font-bold mb-4 mt-8">Continue Assistindo</h2>
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-6 grid-container">
+            {conteudos.slice(0, 8).map((conteudo) => (
+              <div
+                key={conteudo.uuid}
+                className="relative rounded-lg shadow-lg overflow-hidden card-content cursor-pointer"
+                onClick={() => setSelectedContent(conteudo)}
               >
-                Assistir
-              </a>
+                <img
+                  src={conteudo.poster_url}
+                  alt={conteudo.nome}
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute bottom-0 w-full  bg-opacity-60 text-white p-2 text-center text-sm sm:text-lg font-semibold card-overlay">
+                  {conteudo.nome}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <h2 className="text-2xl font-bold mb-4 mt-8">Novidades</h2>
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-6 grid-container">
+            {conteudos
+              .sort(
+                (a, b) => new Date(b.data_criacao).getTime() - new Date(a.data_criacao).getTime()
+              )
+              .map((conteudo) => (
+                <div
+                  key={conteudo.uuid}
+                  className="relative rounded-lg shadow-lg overflow-hidden card-content cursor-pointer"
+                  onClick={() => setSelectedContent(conteudo)}
+                >
+                  <img
+                    src={conteudo.poster_url}
+                    alt={conteudo.nome}
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute bottom-0 w-full  bg-opacity-60 text-white p-2 text-center text-sm sm:text-lg font-semibold card-overlay">
+                    {conteudo.nome}
+                  </div>
+                </div>
+              ))}
+          </div>
+        </div>
+
+        {/* Popup de Detalhes */}
+        {selectedContent && (
+          <div className="fixed inset-0  bg-opacity-60 flex justify-center items-center z-40">
+            <div className="bg-gray-900 p-6 rounded-lg max-w-xs sm:max-w-lg mx-auto text-center relative shadow-2xl">
               <button
                 onClick={closePopup}
-                className="mt-4 text-gray-300 underline"
+                className="absolute top-2 right-2 text-gray-400 hover:text-white"
               >
-                Fechar
+                X {/* Botão de fechar */}
               </button>
+              <img
+                src={selectedContent.poster_url}
+                alt={selectedContent.nome}
+                className="mx-auto rounded-lg w-32 h-48 object-cover mb-4"
+              />
+              <h2 className="text-2xl font-bold mb-4">{selectedContent.nome}</h2>
+              <p className="text-sm mb-4">{selectedContent.sinopse}</p>
+              <div className="flex justify-around mb-4">
+                <button className="bg-blue-500 px-3 py-1 rounded-lg hover:bg-blue-600">Favoritar</button>
+                <button className="bg-blue-500 px-3 py-1 rounded-lg hover:bg-blue-600">Adicionar à Lista</button>
+                <button className="bg-blue-500 px-3 py-1 rounded-lg hover:bg-blue-600">Criar Grupo</button>
+              </div>
+              <a
+                href={`/player/${selectedContent.uuid}`}
+                className="bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-800 block mb-4"
+              >
+                Assistir Agora
+              </a>
+              <a
+                href={`/download/${selectedContent.uuid}`}
+                className="bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-800 block"
+              >
+                Download
+              </a>
             </div>
           </div>
         )}
