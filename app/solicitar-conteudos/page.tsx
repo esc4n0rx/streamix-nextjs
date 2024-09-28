@@ -1,6 +1,6 @@
-"use client";  // Declara que o componente é um Client Component
+"use client"; 
 
-import { useState } from "react";
+import { useState, ChangeEvent, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 
 export default function SolicitarConteudosPage() {
@@ -15,7 +15,7 @@ export default function SolicitarConteudosPage() {
 
   const router = useRouter();
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
@@ -23,7 +23,7 @@ export default function SolicitarConteudosPage() {
     });
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
     try {
@@ -46,10 +46,9 @@ export default function SolicitarConteudosPage() {
 
   return (
     <div className="min-h-screen flex justify-center items-center bg-cover bg-center relative" style={{ backgroundImage: 'url("https://ucare.timepad.ru/ba19db85-233a-4e4c-867e-fd06d35b3a8d/poster_event_686269.jpg")' }}>
-      {/* Efeito de blur no fundo */}
+     
       <div className="absolute inset-0 bg-black bg-opacity-60 backdrop-blur-sm z-0"></div>
-      
-      {/* Formulário centralizado */}
+    
       <form onSubmit={handleSubmit} className="bg-gray-900 bg-opacity-80 p-8 rounded-lg shadow-lg max-w-md w-full z-10 backdrop-blur-md">
         <h2 className="text-3xl font-bold mb-6 text-center">Solicitar Conteúdo</h2>
         
