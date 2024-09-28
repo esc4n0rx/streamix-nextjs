@@ -29,14 +29,18 @@ export default function LoginPage() {
 
       const { token } = await response.json();
 
-     
       Cookies.set('token', token, { expires: 1, secure: true });
       console.log("Token armazenado com sucesso:", token);
 
       router.push("/profile");
       console.log("Redirecionando para a página de perfil...");
     } catch (err) {
-      setError(err.message);
+    
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Ocorreu um erro desconhecido");
+      }
       console.error("Erro ao fazer login:", err);
     }
   };
@@ -49,7 +53,7 @@ export default function LoginPage() {
       }}
     >
       <div className="absolute inset-0 bg-black opacity-50"></div>
-      
+
       <form
         onSubmit={handleLogin}
         className="relative z-10 bg-black bg-opacity-50 p-8 rounded-lg shadow-md w-full max-w-md backdrop-blur-lg"

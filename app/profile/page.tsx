@@ -1,16 +1,16 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
-import jwt from "jsonwebtoken";
+import jwt, { JwtPayload } from "jsonwebtoken";
 import Cookies from "js-cookie";
 import { supabase } from "../../lib/supabaseClient";
 
 export default function ProfileSelectionPage() {
   const router = useRouter();
   const [profiles, setProfiles] = useState([]);
-  const [sessionError, setSessionError] = useState(null);
+  const [sessionError, setSessionError] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
-  const [editingProfile, setEditingProfile] = useState(null);
+  const [editingProfile, setEditingProfile] = useState<any>(null);
   const [newProfileName, setNewProfileName] = useState("");
 
   useEffect(() => {
@@ -24,8 +24,12 @@ export default function ProfileSelectionPage() {
       }
 
       try {
-        const decoded = jwt.decode(token);
-        const userId = decoded.userId;
+        const decoded = jwt.decode(token) as JwtPayload;
+        const userId = decoded?.userId;
+
+        if (!userId) {
+          throw new Error("ID de usuário não encontrado no token.");
+        }
 
         const response = await fetch(`/api/profiles?user_id=${userId}`);
         const { profiles, error } = await response.json();
@@ -47,7 +51,7 @@ export default function ProfileSelectionPage() {
     fetchProfiles();
   }, [router]);
 
-  const handleEditProfile = (profile) => {
+  const handleEditProfile = (profile: any) => {
     setIsEditing(true);
     setEditingProfile(profile);
     setNewProfileName(profile.profile_name);
@@ -84,7 +88,7 @@ export default function ProfileSelectionPage() {
     }
   };
 
-  const handleDeleteProfile = async (profileId) => {
+  const handleDeleteProfile = async (profileId: number) => {
     try {
       const response = await fetch(`/api/profiles/${profileId}`, {
         method: "DELETE",
@@ -105,8 +109,12 @@ export default function ProfileSelectionPage() {
   const handleAddProfile = async () => {
     try {
       const token = Cookies.get("token");
-      const decoded = jwt.decode(token);
-      const userId = decoded.userId;
+      const decoded = jwt.decode(token) as JwtPayload;
+      const userId = decoded?.userId;
+
+      if (!userId) {
+        throw new Error("ID de usuário não encontrado no token.");
+      }
 
       const response = await fetch("/api/profiles", {
         method: "POST",
@@ -136,9 +144,9 @@ export default function ProfileSelectionPage() {
     }
   };
 
-  const handleSelectProfile = async (profileId) => {
+  const handleSelectProfile = async (profileId: number) => {
     try {
-      Cookies.set("selected_profile", profileId, { expires: 1, path: "/" });
+      Cookies.set("selected_profile", profileId.toString(), { expires: 1, path: "/" });
       router.push("/dashboard");
     } catch (error) {
       console.error("Erro ao selecionar o perfil:", error);
