@@ -5,7 +5,6 @@ import jwt from "jsonwebtoken";
 import Cookies from "js-cookie";
 import { supabase } from "../../lib/supabaseClient";
 
-// Definir a estrutura esperada do payload JWT
 interface DecodedToken {
   userId: string;
   exp?: number;
