@@ -27,23 +27,51 @@ export default function RegisterPage() {
     }
 
     // Cria o novo usuário
-    const { error } = await supabase.from("usuarios").insert([
-      {
-        login,
-        senha,
-        email,
-        data_criacao: new Date(),
-      },
-    ]);
+    const { data: userData, error: userError } = await supabase
+      .from("usuarios")
+      .insert([
+        {
+          login,
+          senha,
+          email,
+          data_criacao: new Date(),
+        },
+      ])
+      .select("uuid") // Seleciona o UUID gerado do usuário
+      .single();
 
-    if (error) {
-      console.error("Erro ao registrar:", error);
+    if (userError) {
+      console.error("Erro ao registrar:", userError);
       setError("Erro ao criar conta. Tente novamente.");
       return;
     }
 
-    // Redireciona para a página de login
-    router.push("/login");
+    // Verifica se o usuário foi criado corretamente
+    const userId = userData?.uuid;
+    if (!userId) {
+      setError("Erro ao obter dados do usuário.");
+      return;
+    }
+
+    // Cria o perfil padrão para o novo usuário
+    const { error: profileError } = await supabase
+      .from("account_profile")
+      .insert([
+        {
+          user_id: userId, // Usa o UUID do usuário
+          profile_name: `${login}'s Profile`, // Nome padrão para o perfil
+          avatar_url: "default_avatar.png", // Avatar padrão
+        },
+      ]);
+
+    if (profileError) {
+      console.error("Erro ao criar perfil:", profileError);
+      setError("Erro ao criar perfil. Tente novamente.");
+      return;
+    }
+
+    // Redireciona para a página de login ou dashboard
+    router.push("/login"); // ou você pode redirecionar diretamente para o dashboard
   };
 
   return (

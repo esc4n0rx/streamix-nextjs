@@ -116,8 +116,12 @@ export default function AmbilightPlayer({ params }: { params: { uuid: string } }
     >
       <div className="player-card">
         <video ref={videoRef} controls autoPlay loop className="video-player">
+        <source
+            src={isLocalVideo ? `/vids/${conteudo.url_streaming.split('/vids/')[1]}` : conteudo.url_streaming}
+            type="video/x-matroska"
+          />
           <source
-            src={isLocalVideo ? `/vids/${conteudo.url_streaming.split('/').pop()}` : conteudo.url_streaming}
+            src={isLocalVideo ? `/vids/${conteudo.url_streaming.split('/vids/')[1]}` : conteudo.url_streaming}
             type="video/mp4"
           />
           Seu navegador não suporta a tag de vídeo.

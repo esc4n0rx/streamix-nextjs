@@ -1,7 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Cookies from 'js-cookie';
+import { useRouter } from 'next/navigation';
 import { supabase } from "../../lib/supabaseClient";
+import Link from "next/link";
 import './Banner.css';
 
 type Conteudo = {
@@ -16,8 +19,23 @@ type Conteudo = {
 };
 
 export default function DashboardPage() {
+  const router = useRouter();
   const [conteudos, setConteudos] = useState<Conteudo[]>([]);
   const [selectedContent, setSelectedContent] = useState<Conteudo | null>(null);
+  
+  useEffect(() => {
+    const selectedProfile = Cookies.get("selected_profile");
+
+    if (!selectedProfile) {
+      router.push("/profile");
+    }
+  }, [router]);
+
+  const handleLogout = () => {
+    Cookies.remove('token');
+    router.push('/login');
+  };
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -35,11 +53,11 @@ export default function DashboardPage() {
 
   return (
     <div className="main-content">
-      {/* Fundo com efeito de blur */}
+     
       <div className="background-blur"></div>
 
       <div className="relative min-h-screen">
-        {/* Navbar */}
+       
         <header className="fixed top-0 left-0 right-0 flex justify-between items-center p-4  bg-opacity-80 z-50">
           <div className="flex items-center space-x-4">
             <img src="/img/logo.png" alt="Streamix Logo" width={100} height={40} />
@@ -48,17 +66,20 @@ export default function DashboardPage() {
               <a href="#" className="text-lg font-semibold hover:text-gray-300">Séries</a>
               <a href="#" className="text-lg font-semibold hover:text-gray-300">Filmes</a>
               <a href="#" className="text-lg font-semibold hover:text-gray-300">Animes</a>
-              <a href="#" className="text-lg font-semibold hover:text-gray-300">Solicitar Conteúdos</a>
+              <Link href="/solicitar-conteudos" className="text-lg font-semibold hover:text-gray-300">
+                Solicitar Conteúdos
+              </Link>
             </nav>
           </div>
           <div>
             <a href="#" className="text-lg hover:text-gray-300">
               <img src="/img/profile.png" alt="Profile" width={40} height={40} />
             </a>
+            <button onClick={handleLogout}>Logout</button>
           </div>
         </header>
 
-        {/* Carrossel de Banner */}
+        
         <div className="relative mt-20 mx-auto max-w-full p-4 banner-container">
           <div className="rounded-lg overflow-hidden shadow-lg">
             <div className="relative h-[300px] carousel-container">
@@ -82,7 +103,7 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Seções de Conteúdos */}
+       
         <div className="mt-12 px-4 sm:px-8">
           <h2 className="text-2xl font-bold mb-4">Recomendado para você</h2>
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-6 grid-container">
@@ -151,7 +172,7 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Popup de Detalhes */}
+       
         {selectedContent && (
           <div className="fixed inset-0  bg-opacity-60 flex justify-center items-center z-40">
             <div className="bg-gray-900 p-6 rounded-lg max-w-xs sm:max-w-lg mx-auto text-center relative shadow-2xl">
@@ -159,7 +180,7 @@ export default function DashboardPage() {
                 onClick={closePopup}
                 className="absolute top-2 right-2 text-gray-400 hover:text-white"
               >
-                X {/* Botão de fechar */}
+                X 
               </button>
               <img
                 src={selectedContent.poster_url}

@@ -1,0 +1,113 @@
+body {
+    margin: 0;
+    padding: 0;
+    background: url("https://ucare.timepad.ru/ba19db85-233a-4e4c-867e-fd06d35b3a8d/poster_event_686269.jpg") no-repeat center center fixed;
+    background-size: cover;
+  }
+  .background-blur {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: -1;
+    background: inherit;
+    filter: blur(10px); 
+    -webkit-filter: blur(10px);
+  }
+  .main-content {
+    position: relative;
+    z-index: 1;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.6); 
+    color: white;
+  }
+
+.banner-container {
+    max-width: 100%;
+    overflow: hidden;
+  }
+  
+  .carousel-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .carousel {
+    display: flex;
+    flex-wrap: nowrap;
+    animation: scroll 30s linear infinite;
+  }
+  
+  .carousel img {
+    border-radius: 8px;
+  }
+  
+  .carousel div {
+    flex-shrink: 0;
+    width: 200px;
+  }
+  
+  @keyframes scroll {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-50%);
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .carousel div {
+      width: 180px;
+    }
+  }
+
+  .grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 8px; 
+  }
+  
+  .card-content img {
+    width: 140px; 
+    height: 210px; 
+    object-fit: cover;
+    border-radius: 8px; 
+  }
+  
+  .card-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 6px;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s;
+  }
+  
+  .card-content:hover {
+    transform: scale(1.05); 
+  }
+  
+  .card-overlay {
+    font-size: 12px; 
+    padding: 4px;
+    transition: opacity 0.2s;
+  }
+  .card-content:hover .card-overlay {
+    opacity: 1;
+  }
+  header {
+    backdrop-filter: blur(10px); 
+  }
+  .popup-overlay {
+    background: rgba(0, 0, 0, 0.8);
+  }
+  button {
+    cursor: pointer;
+  }

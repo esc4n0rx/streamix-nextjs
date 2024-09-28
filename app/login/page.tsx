@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { supabase } from "../../lib/supabaseClient";
+import Cookies from "js-cookie";
 import Link from "next/link";
 
 export default function LoginPage() {
@@ -14,22 +14,31 @@ export default function LoginPage() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    
-    const { data, error } = await supabase
-      .from("usuarios")
-      .select("*")
-      .eq("login", login)
-      .eq("senha", senha)
-      .single(); 
+    try {
+      const response = await fetch('/api/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ login, senha }),
+      });
 
-    if (error || !data) {
-      setError("Login ou senha incorretos");
-      console.error("Erro ao fazer login:", error);
-      return;
+      if (!response.ok) {
+        throw new Error("Login ou senha incorretos");
+      }
+
+      const { token } = await response.json();
+
+     
+      Cookies.set('token', token, { expires: 1, secure: true });
+      console.log("Token armazenado com sucesso:", token);
+
+      router.push("/profile");
+      console.log("Redirecionando para a página de perfil...");
+    } catch (err) {
+      setError(err.message);
+      console.error("Erro ao fazer login:", err);
     }
-
-    
-    router.push("/dashboard");
   };
 
   return (
@@ -39,7 +48,7 @@ export default function LoginPage() {
         backgroundImage: `url("https://ucare.timepad.ru/ba19db85-233a-4e4c-867e-fd06d35b3a8d/poster_event_686269.jpg")`,
       }}
     >
-      <div className="absolute inset-0 bg-black opacity-50"></div> 
+      <div className="absolute inset-0 bg-black opacity-50"></div>
       
       <form
         onSubmit={handleLogin}
@@ -50,9 +59,7 @@ export default function LoginPage() {
         {error && <div className="text-red-500 mb-4">{error}</div>}
 
         <div className="mb-4">
-          <label className="block text-white text-sm font-bold mb-2">
-            Login
-          </label>
+          <label className="block text-white text-sm font-bold mb-2">Login</label>
           <input
             type="text"
             value={login}
@@ -64,9 +71,7 @@ export default function LoginPage() {
         </div>
 
         <div className="mb-4">
-          <label className="block text-white text-sm font-bold mb-2">
-            Senha
-          </label>
+          <label className="block text-white text-sm font-bold mb-2">Senha</label>
           <input
             type="password"
             value={senha}
