@@ -14,7 +14,7 @@ type Conteudo = {
 };
 
 export default function AmbilightPlayer({ params }: { params: { uuid: string } }) {
-  const { uuid } = params; 
+  const { uuid } = params;
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [conteudo, setConteudo] = useState<Conteudo | null>(null);
   const [ambilightColors, setAmbilightColors] = useState({
@@ -42,7 +42,6 @@ export default function AmbilightPlayer({ params }: { params: { uuid: string } }
     fetchContent();
   }, [uuid]);
 
-  
   useEffect(() => {
     if (!conteudo || !videoRef.current) return;
 
@@ -99,8 +98,8 @@ export default function AmbilightPlayer({ params }: { params: { uuid: string } }
     return <div className="text-white text-center">Carregando...</div>;
   }
 
-  
   const isLocalVideo = conteudo.url_streaming.includes("vids/");
+  const videoSrc = isLocalVideo ? `/vids/${conteudo.url_streaming.split('/vids/')[1]}` : conteudo.url_streaming;
 
   return (
     <div
@@ -116,14 +115,17 @@ export default function AmbilightPlayer({ params }: { params: { uuid: string } }
     >
       <div className="player-card">
         <video ref={videoRef} controls autoPlay loop className="video-player">
-        <source
-            src={isLocalVideo ? `/vids/${conteudo.url_streaming.split('/vids/')[1]}` : conteudo.url_streaming}
-            type="video/x-matroska"
-          />
-          <source
-            src={isLocalVideo ? `/vids/${conteudo.url_streaming.split('/vids/')[1]}` : conteudo.url_streaming}
-            type="video/mp4"
-          />
+          {isLocalVideo ? (
+            <>
+              <source src={videoSrc} type="video/mp4" />
+              <source src={videoSrc} type="video/x-matroska" />
+            </>
+          ) : (
+            <>
+              <source src={conteudo.url_streaming} type="video/mp4" />
+              <source src={conteudo.url_streaming} type="video/x-matroska" />
+            </>
+          )}
           Seu navegador não suporta a tag de vídeo.
         </video>
       </div>

@@ -36,7 +36,6 @@ export default function DashboardPage() {
     router.push('/login');
   };
 
-
   useEffect(() => {
     const fetchData = async () => {
       const { data, error } = await supabase.from("conteudos").select("*");
@@ -79,12 +78,12 @@ export default function DashboardPage() {
           </div>
         </header>
 
-        
+        {/* Banner */}
         <div className="relative mt-20 mx-auto max-w-full p-4 banner-container">
           <div className="rounded-lg overflow-hidden shadow-lg">
             <div className="relative h-[300px] carousel-container">
-              <div className="carousel flex items-center">
-                {conteudos.map((conteudo, index) => (
+              <div className="carousel flex items-center transition-all duration-700 ease-in-out">
+                {conteudos.slice(0, 30).map((conteudo, index) => (
                   <div
                     key={index}
                     className="flex flex-col items-center text-center w-[200px]"
@@ -103,12 +102,13 @@ export default function DashboardPage() {
           </div>
         </div>
 
-       
+        {/* Recomendado para você */}
         <div className="mt-12 px-4 sm:px-8">
           <h2 className="text-2xl font-bold mb-4">Recomendado para você</h2>
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-6 grid-container">
             {conteudos
               .filter((conteudo) => conteudo.avaliacao >= 7.5)
+              .slice(0, 25) 
               .map((conteudo) => (
                 <div
                   key={conteudo.uuid}
@@ -129,7 +129,7 @@ export default function DashboardPage() {
 
           <h2 className="text-2xl font-bold mb-4 mt-8">Continue Assistindo</h2>
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-6 grid-container">
-            {conteudos.slice(0, 8).map((conteudo) => (
+            {conteudos.slice(0, 10).map((conteudo) => (
               <div
                 key={conteudo.uuid}
                 className="relative rounded-lg shadow-lg overflow-hidden card-content cursor-pointer"
@@ -153,6 +153,7 @@ export default function DashboardPage() {
               .sort(
                 (a, b) => new Date(b.data_criacao).getTime() - new Date(a.data_criacao).getTime()
               )
+              .slice(0, 25)  
               .map((conteudo) => (
                 <div
                   key={conteudo.uuid}
@@ -172,7 +173,6 @@ export default function DashboardPage() {
           </div>
         </div>
 
-       
         {selectedContent && (
           <div className="fixed inset-0  bg-opacity-60 flex justify-center items-center z-40">
             <div className="bg-gray-900 p-6 rounded-lg max-w-xs sm:max-w-lg mx-auto text-center relative shadow-2xl">
